@@ -1,0 +1,10 @@
+{% extends 'upload/base.html' %}
+{% block content %}
+<h2>Upload a C++ Project (ZIP)</h2>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label>Select a ZIP file:</label><br>
+    <input type="file" name="project_zip" accept=".zip" required><br><br>
+    <button type="submit">Generate Documentation</button>
+</form>
+{% endblock %}

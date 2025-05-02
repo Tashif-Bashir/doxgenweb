@@ -1,0 +1,12 @@
+{% extends 'upload/base.html' %}
+{% block content %}
+<h2>Documentation Generated Successfully!</h2>
+<p>Opening documentation in a new tab...</p>
+
+<script>
+    window.open("{{ docs_url }}", "_blank");  // opens docs in new tab
+    setTimeout(function () {
+        window.location.href = "{% url 'dashboard' %}";  // optional: return to dashboard
+    }, 1000);
+</script>
+{% endblock %}

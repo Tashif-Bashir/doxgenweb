@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+
+# Django
+*.sqlite3
+/media/uploads/
+/media/
+/static
+
+# Doxygen output
+**/docs/html/
+/uploads/**
+
+# VS Code
+.vscode/
+
+# Env
+.env

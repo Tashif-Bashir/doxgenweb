@@ -1,0 +1,14 @@
+{% extends 'upload/base.html' %}
+{% block content %}
+<h2>Your Uploaded Projects</h2>
+<ul>
+    {% for proj in uploads %}
+        <li>{{ proj.project_name }} - 
+            <a href="{{ proj.docs_url }}">View Docs</a> - 
+            {{ proj.uploaded_at }}
+        </li>
+    {% empty %}
+        <li>You haven't uploaded any projects yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
