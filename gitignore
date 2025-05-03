@@ -17,3 +17,10 @@ __pycache__/
 
 # Env
 .env
+
+# venv
+doxgenvenv/
+
+
+# Requirements
+requirement.txt
