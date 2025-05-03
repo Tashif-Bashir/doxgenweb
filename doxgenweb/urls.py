@@ -11,7 +11,8 @@ urlpatterns = [
     path('upload/', upload_views.upload_cpp_project, name='upload'),
     path('docs/<str:folder>/', upload_views.serve_docs, name='serve_docs'),
     path('dashboard/', upload_views.user_dashboard, name='dashboard'),
-    path('register/', upload_views.register, name='register'),
     path('login/', auth_views.LoginView.as_view(template_name='upload/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(next_page='home'), name='logout'),
+    path('users/', include('users.urls')),
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

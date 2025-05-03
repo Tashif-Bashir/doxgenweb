@@ -91,15 +91,3 @@ def user_dashboard(request):
 def serve_docs(request, folder):
     # No longer used for direct HTML streaming; handled via static path
     return redirect(f'/media/uploads/{folder}/docs/html/index.html')
-
-
-def register(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('dashboard')
-    else:
-        form = UserCreationForm()
-    return render(request, 'upload/register.html', {'form': form})
