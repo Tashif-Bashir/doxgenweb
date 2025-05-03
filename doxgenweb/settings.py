@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'upload'
+    'upload',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_REDIRECT_URL = '/dashboard/'
 
+
+AUTH_USER_MODEL = 'users.CustomUser'
