@@ -1,10 +1,37 @@
 {% extends 'upload/base.html' %}
+{% block title %}Upload | Doxygen Web Tool{% endblock %}
 {% block content %}
-<h2>Upload a C++ Project (ZIP)</h2>
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <label>Select a ZIP file:</label><br>
-    <input type="file" name="project_zip" accept=".zip" required><br><br>
-    <button type="submit">Generate Documentation</button>
-</form>
+<div class="container py-5">
+  <h2 class="fw-bold mb-4 text-center">Upload a C++ Project (ZIP)</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <form method="POST" enctype="multipart/form-data" id="uploadForm">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="projectZip" class="form-label">Select a ZIP file:</label>
+          <input type="file" class="form-control" id="projectZip" name="project_zip" accept=".zip" required>
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            <span id="submitText">Generate Documentation</span>
+            <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('uploadForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const submitText = document.getElementById('submitText');
+  const loadingSpinner = document.getElementById('loadingSpinner');
+
+  form.addEventListener('submit', function () {
+    submitBtn.disabled = true;
+    submitText.textContent = 'Processing...';
+    loadingSpinner.classList.remove('d-none');
+  });
+</script>
 {% endblock %}

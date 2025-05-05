@@ -1,14 +1,46 @@
 {% extends 'upload/base.html' %}
+{% block title %}Dashboard | Doxygen Web Tool{% endblock %}
 {% block content %}
-<h2>Your Uploaded Projects</h2>
-<ul>
-    {% for proj in uploads %}
-        <li>{{ proj.project_name }} - 
-            <a href="{{ proj.docs_url }}">View Docs</a> - 
-            {{ proj.uploaded_at }}
-        </li>
-    {% empty %}
-        <li>You haven't uploaded any projects yet.</li>
-    {% endfor %}
-</ul>
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="fw-bold mb-0">Your Projects</h2>
+      <p class="text-muted mb-0">You have <strong>{{ uploads|length }}</strong> project{{ uploads|length|pluralize }}.</p>
+    </div>
+    <a href="{% url 'upload' %}" class="btn btn-primary">
+      <i class="bi bi-upload me-1"></i> Upload New
+    </a>
+  </div>
+
+  {% if uploads %}
+    <div class="table-responsive">
+      <table class="table table-hover table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>Project Name</th>
+            <th>Uploaded At</th>
+            <th>Documentation</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for proj in uploads %}
+            <tr>
+              <td>{{ proj.project_name }}</td>
+              <td>{{ proj.uploaded_at|date:"M d, Y H:i" }}</td>
+              <td>
+                <a href="{{ proj.docs_url }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-file-earmark-text me-1"></i> View Docs
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-info text-center">
+      You haven't uploaded any projects yet.
+    </div>
+  {% endif %}
+</div>
 {% endblock %}
