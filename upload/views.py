@@ -5,10 +5,10 @@ import subprocess
 
 from django.conf import settings
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from .models import ProjectUpload
+
+from git import Repo  # pip install GitPython
 
 BASE_UPLOAD_DIR = os.path.join(settings.MEDIA_ROOT, 'uploads')
 
@@ -49,10 +49,47 @@ def upload_cpp_project(request):
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
             zip_ref.extractall(code_dir)
 
-        # Create Doxyfile
-        doxyfile_path = os.path.join(session_path, 'Doxyfile')
-        with open(doxyfile_path, 'w') as f:
-            f.write(f"""
+        return _process_project(request, project_name, code_dir, doc_dir, session_id)
+
+    return render(request, 'upload/upload.html')
+
+
+@login_required
+def import_from_github(request):
+    """
+    Clones a GitHub repository and runs Doxygen.
+    """
+    if request.method == 'POST':
+        repo_url = request.POST.get('repo_url')
+        if not repo_url:
+            return render(request, 'upload/github_import.html', {'error': 'Repository URL is required.'})
+
+        session_id = str(uuid.uuid4())
+        session_path = os.path.join(BASE_UPLOAD_DIR, session_id)
+        code_dir = os.path.join(session_path, 'code')
+        doc_dir = os.path.join(session_path, 'docs')
+
+        os.makedirs(code_dir, exist_ok=True)
+        os.makedirs(doc_dir, exist_ok=True)
+
+        try:
+            Repo.clone_from(repo_url, code_dir)
+        except Exception as e:
+            return render(request, 'upload/github_import.html', {'error': f'Failed to clone repo: {e}'})
+
+        repo_name = repo_url.rstrip('/').split('/')[-1]
+        return _process_project(request, repo_name, code_dir, doc_dir, session_id)
+
+    return render(request, 'upload/github_import.html')
+
+
+def _process_project(request, project_name, code_dir, doc_dir, session_id):
+    """
+    Common helper to generate docs with Doxygen.
+    """
+    doxyfile_path = os.path.join(BASE_UPLOAD_DIR, session_id, 'Doxyfile')
+    with open(doxyfile_path, 'w') as f:
+        f.write(f"""
 PROJECT_NAME = "{project_name}"
 OUTPUT_DIRECTORY = {doc_dir}
 INPUT = {code_dir}
@@ -63,35 +100,25 @@ EXTRACT_ALL = YES
 QUIET = YES
 """)
 
-        # Run Doxygen
-        subprocess.run(['doxygen', doxyfile_path])
+    subprocess.run(['doxygen', doxyfile_path])
 
-        # Save to DB
-        ProjectUpload.objects.create(
-            user=request.user,
-            project_name=project_name,
-            session_id=session_id
-        )
+    ProjectUpload.objects.create(
+        user=request.user,
+        project_name=project_name,
+        session_id=session_id
+    )
 
-        return render(request, 'upload/open_docs.html', {
-            'docs_url': f'/media/uploads/{session_id}/docs/html/index.html'
-        })
-
-    return render(request, 'upload/upload.html')
+    return render(request, 'upload/open_docs.html', {
+        'docs_url': f'/media/uploads/{session_id}/docs/html/index.html'
+    })
 
 
 @login_required
 def user_dashboard(request):
-    """
-    Legacy dashboard view — may no longer be used if shown in home.html.
-    """
     uploads = ProjectUpload.objects.filter(user=request.user).order_by('-uploaded_at')
     return render(request, 'upload/dashboard.html', {'uploads': uploads})
 
 
 @login_required
 def serve_docs(request, folder):
-    """
-    Redirects to generated documentation static HTML.
-    """
     return redirect(f'/media/uploads/{folder}/docs/html/index.html')

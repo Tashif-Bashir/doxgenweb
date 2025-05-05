@@ -1,0 +1,37 @@
+{% extends 'upload/base.html' %}
+{% block title %}Import from GitHub | Doxygen Web Tool{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="fw-bold mb-4 text-center">Import GitHub Repository</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <form method="post" id="githubForm">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="repoUrl" class="form-label">GitHub Repository URL</label>
+          <input type="url" class="form-control" id="repoUrl" name="repo_url" placeholder="https://github.com/user/repo" required>
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-dark" id="submitBtn">
+            <span id="submitText">Import Repo</span>
+            <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('githubForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const submitText = document.getElementById('submitText');
+  const loadingSpinner = document.getElementById('loadingSpinner');
+
+  form.addEventListener('submit', function () {
+    submitBtn.disabled = true;
+    submitText.textContent = 'Importing...';
+    loadingSpinner.classList.remove('d-none');
+  });
+</script>
+{% endblock %}
