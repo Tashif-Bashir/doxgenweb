@@ -1,25 +1,48 @@
-<h2>Enter OTP</h2>
-<form method="post">
-  {% csrf_token %}
-  <input type="text" name="otp" placeholder="Enter 6-digit code" required><br><br>
-  <button type="submit">Verify</button>
-</form>
+{% extends 'upload/base.html' %}
+{% block title %}Verify OTP | Doxygen Web Tool{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="fw-bold mb-4 text-center">Verify Your Email</h2>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {% if error %}
+          <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
 
-{% if error %}<p style="color:red;">{{ error }}</p>{% endif %}
+        <div class="mb-3">
+          <label for="otp" class="form-label">Enter 6-digit OTP</label>
+          <input type="text" id="otp" name="otp" class="form-control" placeholder="123456" maxlength="6" required>
+        </div>
 
-<p id="timer">Resend in 30s...</p>
-<a href="{% url 'resend_otp' %}" id="resend" style="display:none;">Resend OTP</a>
+        <div class="d-grid mb-3">
+          <button type="submit" class="btn btn-primary">Verify</button>
+        </div>
+      </form>
+
+      <div class="text-center">
+        <p id="timer" class="text-muted">Resend in 30s...</p>
+        <a href="{% url 'resend_otp' %}" id="resend" class="btn btn-link p-0" style="display: none;">Resend OTP</a>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
   let seconds = 30;
+  const timerElem = document.getElementById("timer");
+  const resendLink = document.getElementById("resend");
+
   let timer = setInterval(() => {
     seconds--;
     if (seconds > 0) {
-      document.getElementById("timer").textContent = `Resend in ${seconds}s...`;
+      timerElem.textContent = `Resend in ${seconds}s...`;
     } else {
       clearInterval(timer);
-      document.getElementById("timer").style.display = "none";
-      document.getElementById("resend").style.display = "inline";
+      timerElem.style.display = "none";
+      resendLink.style.display = "inline";
     }
   }, 1000);
 </script>
+{% endblock %}
